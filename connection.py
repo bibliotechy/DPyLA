@@ -45,37 +45,53 @@ class DPLA():
         url += "api_key=" + self.api_key
         return url
 
-    def _flushPreviousValues(self):
-        for param in self.params:
-            self.__dict__[param] = None
-
-
-class Request(DPLA):
-    def __init__(self, query=None, searchFields=None,returnFields=None,facets=None,sortBy=None,pagination=None):
+class Request():
+    def __init__(self, query=None, searchFields=None,returnFields=None,facets=None,sort=None,pagination=None):
         self.params = locals()
         # Clear out object attributes
         self._flushPreviousValues()
         if query:
-            self.query =  self._queryFormatter(query)
+            self.query =  self._singleValueFormatter('q',query)
         if searchFields:
             self.searchFields= self._searchFieldsFormatter(searchFields)
         if returnFields:
             self.returnFields = self._multiValueFormatter('fields',returnFields)
-        if facets.facets:
-            self.facets = self._multiValueFormatter('facets',facets.facets)
-        if facets.limit:
-            self.facets += "facet_size=%s" % facets.limit
+        if facets:
+            self._facets_init(facets)
+        if sort:
+            self._sort_init(sort)
 
 
-    def _queryFormatter(self, query):
-            return urlencode({"q":query}) + "&"
+    def _facets_init(self, facets):
+        if facets['fields']:
+            self.facets = self._multiValueFormatter('facets',facets['fields'])
+            if facets['limit']:
+                self.facets_limit =  self._singleValueFormatter('facets_limit', facets['limit'])
+
+
+    def _sort_init(self, sort):
+        if sort['field']:
+            self.sort = self._singleValueFormatter('sort_by', sort['field'])
+        if sort['spatial']:
+            self.spatialSort = self._singleValueFormatter('sort_by_pin', ','.join(sort['distance_from']))
+            if sort['field'] != "sourceResource.spatial.coordinates":
+                self.sort = self._singleValueFormatter('sort_by', "sourceResource.spatial.coordinates")
+                print 'Forced sort to coordinates to work with sort by pin'
+
+    def _singleValueFormatter(self, param_name, value):
+            return urlencode({param_name: value}) + "&"
 
     def _searchFieldsFormatter(self, searchFields):
         sf = [urlencode({k:v}) for k,v in searchFields.items() if k in settings.searchable_fields]
         return '&'.join(sf) + "&"
 
     def _multiValueFormatter(self, param_name, values):
-        return '%s=%s&' % (param_name, ','.join(values))
+        return urlencode({param_name: ','.join(values)}) + "&"
+
+    def _flushPreviousValues(self):
+        for param in self.params:
+            self.__dict__[param] = None
+
 
 class Results():
     def __init__(self, response):

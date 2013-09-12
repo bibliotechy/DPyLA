@@ -51,11 +51,9 @@ class testDPyLAClass(unittest.TestCase):
 class DPyLA_unit(unittest.TestCase):
 
     def test_return_fields_formatter(self):
-        fields   = ('sourceResource.title', 'sourceResource.spatial.state')
-        request  = Request(returnFields=fields)
-        expected = "fields=sourceResource.title,sourceResource.spatial.state&"
-        message  = "Return fields url fragment formatted correctly"
-        self.assertEqual(request.returnFields, expected, message)
+        request  = Request(returnFields=('sourceResource.title', 'sourceResource.spatial.state'))
+        expected = "fields=sourceResource.title%2CsourceResource.spatial.state&"
+        self.assertEqual(request.returnFields, expected, "Return fields url fragment are correct")
 
 
 
