@@ -17,11 +17,12 @@ class DPLA():
 
     def itemSearch(self,query=None,**kwargs):
         """
-        Builds and performs item search.
-        :query - a simple search query. Concatenate spaces with '+'. Boolean operators allowed
-        :searchFields -  Dictionary of field : "search value" pairs. Value is searched for only in the specified
+        Builds and performs an item search.
+
+        query -- a simple search query. Concatenate spaces with '+'. Boolean operators allowed
+        searchFields --  Dictionary of field : "search value" pairs. Value is searched for only in the specified
           field. List of available fields is at http://dp.la/info/developers/codex/responses/field-reference/
-        :returnFields - Fields that should be returned for each record. If blank, all fields are returned.
+        returnFields -- Fields that should be returned for each record. If blank, all fields are returned.
          :facets -
         """
         #get the params as a dictionary
@@ -46,10 +47,11 @@ class DPLA():
         return url
 
 class Request():
-    def __init__(self, query=None, searchFields=None,returnFields=None,facets=None,sort=None,pagination=None):
+    def __init__(self, query=None, searchFields=None,returnFields=None,facets=None,sort=None,pagination=None, keepValues=None):
         self.params = locals()
         # Clear out object attributes
-        self._flushPreviousValues()
+        if keepValues:
+            self._flushPreviousValues()
         if query:
             self.query =  self._singleValueFormatter('q',query)
         if searchFields:
@@ -60,23 +62,34 @@ class Request():
             self._facets_init(facets)
         if sort:
             self._sort_init(sort)
+        if pagination:
+            self._paging_init(pagination)
 
 
     def _facets_init(self, facets):
-        if facets['fields']:
-            self.facets = self._multiValueFormatter('facets',facets['fields'])
-            if facets['limit']:
-                self.facets_limit =  self._singleValueFormatter('facets_limit', facets['limit'])
+        if facets.get('fields', None):
+            self.facets = self._multiValueFormatter('facets',list(facets['fields']))
+        if facets.get('spatial', None):
+            self.facets = self._facetSpatialFormatter(facets)
+        if facets.get('limit', None):
+            self.facets_limit =  self._singleValueFormatter('facet_size', facets['limit'])
 
 
     def _sort_init(self, sort):
-        if sort['field']:
-            self.sort = self._singleValueFormatter('sort_by', sort['field'])
-        if sort['spatial']:
-            self.spatialSort = self._singleValueFormatter('sort_by_pin', ','.join(sort['distance_from']))
-            if sort['field'] != "sourceResource.spatial.coordinates":
-                self.sort = self._singleValueFormatter('sort_by', "sourceResource.spatial.coordinates")
+        if sort.get('field', None):
+            self.sortBy = self._singleValueFormatter('sort_by', sort['field'])
+        if sort.get('spatial', None):
+            self.spatialSort = self._singleValueFormatter('sort_by_pin', ','.join(sort['spatial']))
+            if sort.get('field', None) != "sourceResource.spatial.coordinates":
+                self.sortBy = self._singleValueFormatter('sort_by', "sourceResource.spatial.coordinates")
                 print 'Forced sort to coordinates to work with sort by pin'
+
+    def _paging_init(self, pagination):
+        if pagination.get('limit', None):
+            self.limit = self._singleValueFormatter('page_size', pagination['limit'])
+        if pagination.get('page', None):
+            self.page = self._singleValueFormatter('page', pagination['page'])
+
 
     def _singleValueFormatter(self, param_name, value):
             return urlencode({param_name: value}) + "&"
@@ -84,6 +97,10 @@ class Request():
     def _searchFieldsFormatter(self, searchFields):
         sf = [urlencode({k:v}) for k,v in searchFields.items() if k in settings.searchable_fields]
         return '&'.join(sf) + "&"
+
+    def _facetSpatialFormatter(self, facets):
+        coords = "sourceResource.spatial.coordinates:{}:{}".format(*facets['spatial'])
+        return urlencode({"facets": coords}) + "&"
 
     def _multiValueFormatter(self, param_name, values):
         return urlencode({param_name: ','.join(values)}) + "&"

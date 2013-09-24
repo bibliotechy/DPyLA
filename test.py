@@ -28,27 +28,34 @@ class testDPyLAClass(unittest.TestCase):
         with self.assertRaises(ValueError):
             dpla = DPLA("shortstring")
 
-    def test_item_search_init_query(self):
-        dpla = DPLA()
-        dpla.itemSearch("dogs")
-        self.assertEqual(dpla.request.query, 'q=dogs&', "Query parameter set as attribute correctly")
-        dpla.itemSearch("many dogs running")
-        self.assertEqual(dpla.request.query, "q=many+dogs+running&", "Multi word query is set correctly")
 
-    def test_item_search_init_searchFields(self):
-        dpla = DPLA()
-        dpla.itemSearch(searchFields={"sourceResource.title": "Chicken"})
-        expected = "sourceResource.title=Chicken&"
-        self.assertEqual(dpla.request.searchFields, expected, "Single Search field set correctly")
-        multi = {
-            "sourceResource.spatial.state" :"Illinois",
-            "sourceResource.spatial.county": "Cook County"
-        }
-        dpla.itemSearch(searchFields=multi)
-        expected = "sourceResource.spatial.state=Illinois&sourceResource.spatial.county=Cook+County&"
-        self.assertEqual(dpla.request.searchFields, expected, "Multivalue searchField params sets correctly")
+class DPyLARequest(unittest.TestCase):
 
-class DPyLA_unit(unittest.TestCase):
+    def setUp(self):
+        self.r = Request()
+
+    def test_sort_init(self):
+        r1 = self.r
+        r1._sort_init({'field' : 'sourceResource.title'})
+        self.assertEqual("sort_by=sourceResource.title&", r1.sortBy)
+        r1._sort_init({'spatial':  ('47','-38')})
+        self.assertEqual("sort_by_pin=47%2C-38&", r1.spatialSort)
+        msg = "If Spatial sort, then sortBy must be coordinates"
+        self.assertEqual("sort_by=sourceResource.spatial.coordinates&", r1.sortBy, msg)
+
+    def test_facet_init(self):
+        r2 = self.r
+        r2._facets_init({'fields' : ['sourceResource.title']})
+        self.assertEqual("facets=sourceResource.title&", r2.facets, "Single facet url fragment correct")
+        r2._facets_init({'fields' : ['sourceResource.title', 'sourceResource.spatial.city']})
+        expected = "facets=sourceResource.title%2CsourceResource.spatial.city&"
+        self.assertEqual(expected, r2.facets, "Multiple facet url fragment is correct")
+        r2._facets_init({'fields' : 'sourceResource.title', 'limit' : '5'})
+        self.assertEqual("facet_size=5&", r2.facets_limit)
+        r2._facets_init({"spatial" : ['48', '-37']})
+        self.assertEqual("facets=sourceResource.spatial.coordinates%3A48%3A-37&", r2.facets)
+
+
 
     def test_return_fields_formatter(self):
         request  = Request(returnFields=('sourceResource.title', 'sourceResource.spatial.state'))
