@@ -2,10 +2,11 @@
 
 
 #DPyLA - A Python client for the DPLA API
+#### under active development! 
 
 [The DPLA](http://dp.la) (Digital Public Library of America) is aggregation  digital library, archive and museum collections. What really makes it stand out is it's awesome API. This python library is a wrapper around that API, making it easier to interact with.
 
-####Getting started
+####Getting started
 
 
 `>>> from dpla import DPLA`
