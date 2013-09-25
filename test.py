@@ -1,7 +1,6 @@
 import unittest
-from connection import *
+from dpla import *
 import settings
-import pprint
 
 
 class testDPyLAClass(unittest.TestCase):
