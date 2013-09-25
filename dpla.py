@@ -93,8 +93,8 @@ class Request():
                 print 'Forced sort to coordinates to work with sort by pin'
 
     def _paging_init(self, pagination):
-        if pagination.get('limit', None):
-            self.limit = self._singleValueFormatter('page_size', pagination['limit'])
+        if pagination.get('page_size', None):
+            self.page_size = self._singleValueFormatter('page_size', pagination['page_size'])
         if pagination.get('page', None):
             self.page = self._singleValueFormatter('page', pagination['page'])
 

@@ -54,6 +54,12 @@ class DPyLARequest(unittest.TestCase):
         r2._facets_init({"spatial" : ['48', '-37']})
         self.assertEqual("facets=sourceResource.spatial.coordinates%3A48%3A-37&", r2.facets)
 
+    def test_paging_init(self):
+        r3 = self.r
+        r3._paging_init({'page_size' : 50, 'page' : 5 })
+        self.assertEqual("page_size=50&", r3.page_size, "Page size url fragment is correct")
+        self.assertEqual('page=5&', r3.page, 'Page url fragment is correct')
+
 
 
     def test_return_fields_formatter(self):
