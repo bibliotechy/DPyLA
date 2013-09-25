@@ -19,19 +19,27 @@ class DPLA():
         """
         Builds and performs an item search.
 
-        query -- a simple search query. Concatenate spaces with '+'. Boolean operators allowed
-        searchFields --  Dictionary of field : "search value" pairs. Value is searched for only in the specified
+        query -- a simple search query. Boolean Search operators allowed.
+        searchFields -- Dictionary  of "field name" : "search value" pairs. Value is searched for only in the specified
           field. List of available fields is at http://dp.la/info/developers/codex/responses/field-reference/
-        returnFields -- Fields that should be returned for each record. If blank, all fields are returned.
-         :facets -
+        returnFields --  Tuple of field names. Only the values of specified fields will be returned.
+         If no fields are passed, values for all fields will be returned.
+        facets -- Dictionary with fields, spatial & limit as valid keys.
+         fields - tuple of field names,  Results will include a list of the most common values for those fields fields.
+         spatial - Tuple of Lat / Long. Will return list of common distances from that geo-coordinate.
+         limit - Number of facets to return (for each field?)
+        sort -- Dictionary with field and spatial as valid keys.
+          field -- Tuple of fields. Results are sorted by these fields
+          spatial -- Lat / Long Tuple. Sort by distance from an geo-coordinate
+
         """
+
         #get the params as a dictionary
 
         if query:
             kwargs['query'] = query
 
         self.request = Request(**kwargs)
-
         self.url = self._buildUrl('items', kwargs)
         print self.url
         self.responseRaw = urlopen(self.url).read()
