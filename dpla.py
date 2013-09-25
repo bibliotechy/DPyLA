@@ -122,25 +122,30 @@ class Results():
     def __init__(self, response):
         self.count = response['count']
         self.limit = response['limit']
+        self.start  = response['start']
+        self.items= [Result(doc) for doc in response['docs']]
 
+
+class Result():
+    def __init__(self, document):
+        for field, value in document.iteritems():
+            self.__dict__[self._fieldGetName(field)] = value
 
     def _fieldGetName(self, field):
-        """
-        Returns the Python friendly attribute name for a DPLA field
-        """
-        return field.replace('.','-')
+            """
+            Returns the Python friendly attribute name for a DPLA field
+            """
+            return field.replace('.','-')
 
     def _fieldSetValue(self,field, value):
-        """
-        Sets value for an attribute corresponding to DPLA field.
-        Some DPLA fields contain periods.
-        """
-        self.__dict__['fields'][self._fieldGetName(field)] = value
+            """
+            Sets value for an attribute corresponding to DPLA field.
+            Some DPLA fields contain periods.
+            """
+            self.__dict__['fields'][self._fieldGetName(field)] = value
 
     def _fieldGetValue(self, field):
-         return self.__dict__['fields'][self._fieldGetName(field)]
-
-
+            return self.__dict__['fields'][self._fieldGetName(field)]
 
 
 
