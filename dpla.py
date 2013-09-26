@@ -2,6 +2,7 @@ from urllib import urlencode, urlopen
 import settings
 import json
 
+
 class DPLA():
 
     def __init__(self,api_key=None):
@@ -128,14 +129,22 @@ class Results():
 
 class Result():
     def __init__(self, document):
-        for field, value in document.iteritems():
-            self.__dict__[self._fieldGetName(field)] = value
+        self._unpack_result_as_attributes(document)
+        self._set_shortcuts()
 
-    def _fieldGetName(self, field):
-            """
-            Returns the Python friendly attribute name for a DPLA field
-            """
-            return field.replace('.','-')
+
+    def _unpack_result_as_attributes(self, document):
+        for k, v in document.iteritems():
+            if k.startswith("@"):
+                k = k[1:]
+            setattr(self, k, v)
+
+    def _set_shortcuts(self):
+        self.title = self.__dict__.get('sourceResource', {}).get('title', None)
+        self.image_url = self.__dict__.get('hasView', {}).get('@id', None)
+
+
+
 
     def _fieldSetValue(self,field, value):
             """
@@ -148,5 +157,8 @@ class Result():
             return self.__dict__['fields'][self._fieldGetName(field)]
 
 
-
-
+def _fieldGetName(field):
+    """
+    Returns the Python friendly attribute name for a DPLA field
+    """
+    return field.replace('.','-')
