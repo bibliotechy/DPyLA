@@ -1,6 +1,6 @@
-from urllib import urlencode, urlopen
+from requests import get
+from requests.compat import urlencode
 import settings
-import json
 
 
 class DPLA():
@@ -42,10 +42,8 @@ class DPLA():
 
         self.request = Request(**kwargs)
         self.url = self._buildUrl('items', kwargs)
-        print self.url
-        self.responseRaw = urlopen(self.url).read()
-        self.response = json.loads(self.responseRaw)
-        self.results = Results(self.response)
+        raw = get(self.url)
+        self.results = Results(raw.json())
 
     def _buildUrl(self, type, kwargs=None):
         url = self.BASE_URL + type + "?"
@@ -59,7 +57,7 @@ class Request():
     def __init__(self, query=None, searchFields=None,returnFields=None,facets=None,sort=None,pagination=None, keepValues=None):
         self.params = locals()
         # Clear out object attributes
-        if keepValues:
+        if not keepValues:
             self._flushPreviousValues()
         if query:
             self.query =  self._singleValueFormatter('q',query)
@@ -91,7 +89,7 @@ class Request():
             self.spatialSort = self._singleValueFormatter('sort_by_pin', ','.join(sort['spatial']))
             if sort.get('field', None) != "sourceResource.spatial.coordinates":
                 self.sortBy = self._singleValueFormatter('sort_by', "sourceResource.spatial.coordinates")
-                print 'Forced sort to coordinates to work with sort by pin'
+
 
     def _paging_init(self, pagination):
         if pagination.get('page_size', None):
@@ -144,17 +142,15 @@ class Result():
         self.image_url = self.__dict__.get('hasView', {}).get('@id', None)
 
 
-
-
     def _fieldSetValue(self,field, value):
             """
             Sets value for an attribute corresponding to DPLA field.
             Some DPLA fields contain periods.
             """
-            self.__dict__['fields'][self._fieldGetName(field)] = value
+            self.__dict__['fields'][_fieldGetName(field)] = value
 
     def _fieldGetValue(self, field):
-            return self.__dict__['fields'][self._fieldGetName(field)]
+            return self.__dict__['fields'][_fieldGetName(field)]
 
 
 def _fieldGetName(field):
