@@ -1,4 +1,5 @@
-api_key = "9da474273d98c8dc3dc567939e89f9f8"
+API_KEY = "9da474273d98c8dc3dc567939e89f9f8"
+BASE_URL = "http://api.dp.la/v2/"
 
 
 searchable_fields = (

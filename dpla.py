@@ -6,11 +6,11 @@ import settings
 class DPLA():
 
     def __init__(self,api_key=None):
-        self.BASE_URL = "http://api.dp.la/v2/"
+
         if api_key is not None:
             self.api_key = api_key
-        elif settings.api_key is not None:
-            self.api_key = settings.api_key
+        elif settings.API_KEY is not None:
+            self.api_key = settings.API_KEY
         else:
             raise ValueError('DPLA API requires an api key. Run DPLA.get_key() to request one')
         if len(self.api_key) is not 32:
@@ -40,25 +40,13 @@ class DPLA():
         if query:
             kwargs['query'] = query
 
-        self.request = Request(**kwargs)
-        self.url = self._buildUrl('items', kwargs)
-        raw = get(self.url)
-        self.results = Results(raw.json())
-
-    def _buildUrl(self, type, kwargs=None):
-        url = self.BASE_URL + type + "?"
-        for param in kwargs:
-            if self.request.__dict__.get(param, None):
-                url += self.request.__dict__[param]
-        url += "api_key=" + self.api_key
-        return url
+        request = Request(**kwargs)
+        return Results(get(request.url).json(), request)
 
 class Request():
-    def __init__(self, query=None, searchFields=None,returnFields=None,facets=None,sort=None,pagination=None, keepValues=None):
-        self.params = locals()
+    def __init__(self, query=None, type="items", searchFields=None,returnFields=None,facets=None,sort=None,pagination=None):
+        self.params = locals().pop('self')
         # Clear out object attributes
-        if not keepValues:
-            self._flushPreviousValues()
         if query:
             self.query =  self._singleValueFormatter('q',query)
         if searchFields:
@@ -71,6 +59,8 @@ class Request():
             self._sort_init(sort)
         if pagination:
             self._paging_init(pagination)
+        self.url = self._buildUrl(type,locals())
+
 
 
     def _facets_init(self, facets):
@@ -92,10 +82,14 @@ class Request():
 
 
     def _paging_init(self, pagination):
+        self.pagination = ""
         if pagination.get('page_size', None):
             self.page_size = self._singleValueFormatter('page_size', pagination['page_size'])
+            self.pagination += self.page_size
         if pagination.get('page', None):
             self.page = self._singleValueFormatter('page', pagination['page'])
+            self.pagination += self.page
+
 
 
     def _singleValueFormatter(self, param_name, value):
@@ -116,45 +110,20 @@ class Request():
         for param in self.params:
             self.__dict__[param] = None
 
+    def _buildUrl(self, type, kwargs=None):
+        url = settings.BASE_URL + type + "?"
+        for param in kwargs:
+            if self.__dict__.get(param, None):
+                url += self.__dict__[param]
+        url += "api_key=" + settings.API_KEY
+        self.url = url
+        return url
+
 
 class Results():
-    def __init__(self, response):
+    def __init__(self, response, request):
+        self.request = request
         self.count = response['count']
         self.limit = response['limit']
         self.start  = response['start']
-        self.items= [Result(doc) for doc in response['docs']]
-
-
-class Result():
-    def __init__(self, document):
-        self._unpack_result_as_attributes(document)
-        self._set_shortcuts()
-
-
-    def _unpack_result_as_attributes(self, document):
-        for k, v in document.iteritems():
-            if k.startswith("@"):
-                k = k[1:]
-            setattr(self, k, v)
-
-    def _set_shortcuts(self):
-        self.title = self.__dict__.get('sourceResource', {}).get('title', None)
-        self.image_url = self.__dict__.get('hasView', {}).get('@id', None)
-
-
-    def _fieldSetValue(self,field, value):
-            """
-            Sets value for an attribute corresponding to DPLA field.
-            Some DPLA fields contain periods.
-            """
-            self.__dict__['fields'][_fieldGetName(field)] = value
-
-    def _fieldGetValue(self, field):
-            return self.__dict__['fields'][_fieldGetName(field)]
-
-
-def _fieldGetName(field):
-    """
-    Returns the Python friendly attribute name for a DPLA field
-    """
-    return field.replace('.','-')
+        self.items= [doc for doc in response['docs']]

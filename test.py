@@ -16,10 +16,10 @@ class testDPyLAClass(unittest.TestCase):
 
     def test_api_key_from_settings(self):
         message = "Valid key in settings should be set as attribute"
-        self.assertEqual(self.dpla.api_key, settings.api_key, message)
+        self.assertEqual(self.dpla.api_key, settings.API_KEY, message)
 
     def test_missing_api_key(self):
-        settings.api_key = None
+        settings.API_KEY = None
         with self.assertRaises(ValueError):
             dpla = DPLA()
 
@@ -60,12 +60,21 @@ class DPyLARequest(unittest.TestCase):
         self.assertEqual("page_size=50&", r3.page_size, "Page size url fragment is correct")
         self.assertEqual('page=5&', r3.page, 'Page url fragment is correct')
 
-
-
-    def test_return_fields_formatter(self):
+    def test_multivalue_fields_formatter(self):
         request  = Request(returnFields=('sourceResource.title', 'sourceResource.spatial.state'))
         expected = "fields=sourceResource.title%2CsourceResource.spatial.state&"
         self.assertEqual(request.returnFields, expected, "Return fields url fragment are correct")
+
+    def test_search_field_formatter(self):
+        request = Request(searchFields=({"sourceResource.title" : "Chicago", "sourceResource.subject" : "Food"}))
+        expected = "sourceResource.title=Chicago&sourceResource.subject=Food&"
+        self.assertEqual(request.searchFields, expected, "Search specific fields url fragments are correct")
+
+    def test_build_url(self):
+        request = Request("chicken",searchFields=({'sourceResource.title': "Model"}))
+        expected = 'http://api.dp.la/v2/items?q=chicken&sourceResource.title=Model&api_key=9da474273d98c8dc3dc567939e89f9f8'
+        self.assertEqual(request.url, expected)
+
 
 
 
