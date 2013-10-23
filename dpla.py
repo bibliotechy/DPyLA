@@ -16,26 +16,33 @@ class DPLA():
         if len(self.api_key) is not 32:
             raise ValueError("The DPLA key is in the required format. PLease check it again")
 
-    def itemSearch(self,query=None,**kwargs):
+    def search(self,query=None, type="items", **kwargs):
         """
         Builds and performs an item search.
 
         query -- a simple search query. Boolean Search operators allowed.
-        searchFields -- Dictionary  of "field name" : "search value" pairs. Value is searched for only in the specified
-          field. List of available fields is at http://dp.la/info/developers/codex/responses/field-reference/
-        returnFields --  Tuple of field names. Only the values of specified fields will be returned.
-         If no fields are passed, values for all fields will be returned.
-        facets -- Dictionary with fields, spatial & limit as valid keys.
-         fields - tuple of field names,  Results will include a list of the most common values for those fields fields.
-         spatial - Tuple of Lat / Long. Will return list of common distances from that geo-coordinate.
-         limit - Number of facets to return (for each field?)
-        sort -- Dictionary with field and spatial as valid keys.
-          field -- Tuple of fields. Results are sorted by these fields
-          spatial -- Lat / Long Tuple. Sort by distance from an geo-coordinate
+        type  -- determines what type of search to perform, items or collections
+        **kwargs -- The DPLA API has many possible parameters that can be passed.
+        Pass parameters as kwarg key=value pairs. Some options include:
+         search in fields -- string field name as key, string search term as value.
+          Value is searched for only in the specified field.
+          Multiple fields / search terms can be listed
+          List of available fields is at http://dp.la/info/developers/codex/responses/field-reference/
+         return fields -- "fields" as key, list of field names as value
+          Only the values of specified fields will be returned.
+          If no fields are passed, values for all fields will be returned.
+         facets -- 'facets' as they key, list of field names as value
+          Returns a list of the most common values for that field
+         spatial facet -- key = "facet_spatial" 2 item list consisting of of Lat , Long.
+          Will return list of common distances from that geo-coordinate.
+         facet limit -- "facet_limit" as key, number as value
+          Number of facets to display (for each field?)
+         sort -- "sort" as key , list of fieldnames as value.
+          Results are sorted by these fields
+         spatial sort -- "spatial_sort" as key, 2 item list consisting of of Lat , Long. as value
+          Sort by distance from an geo-coordinate
 
         """
-
-        #get the params as a dictionary
 
         if query:
             kwargs['query'] = query
