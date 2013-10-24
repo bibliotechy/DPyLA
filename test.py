@@ -32,50 +32,46 @@ class DPyLARequest(unittest.TestCase):
 
     def setUp(self):
         self.r = Request()
+        self.query              = self.r._singleValueFormatter('q','chicken')
+        self.multiword_query    = self.r._singleValueFormatter('q','chicken man')
+        self.multivalue_fields  = self.r._multiValueFormatter('fields',["sourceResource.title", "sourceResource.spatial.state"])
+        self.search_fields      = self.r._searchFieldsFormatter({"sourceResource.title" : "Chicago", "sourceResource.subject" : "Food"})
 
-    def test_sort_init(self):
-        r1 = self.r
-        r1._sort_init({'field' : 'sourceResource.title'})
-        self.assertEqual("sort_by=sourceResource.title&", r1.sortBy)
-        r1._sort_init({'spatial':  ('47','-38')})
-        self.assertEqual("sort_by_pin=47%2C-38&", r1.spatialSort)
-        msg = "If Spatial sort, then sortBy must be coordinates"
-        self.assertEqual("sort_by=sourceResource.spatial.coordinates&", r1.sortBy, msg)
-
-    def test_facet_init(self):
-        r2 = self.r
-        r2._facets_init({'fields' : ['sourceResource.title']})
-        self.assertEqual("facets=sourceResource.title&", r2.facets, "Single facet url fragment correct")
-        r2._facets_init({'fields' : ['sourceResource.title', 'sourceResource.spatial.city']})
-        expected = "facets=sourceResource.title%2CsourceResource.spatial.city&"
-        self.assertEqual(expected, r2.facets, "Multiple facet url fragment is correct")
-        r2._facets_init({'fields' : 'sourceResource.title', 'limit' : '5'})
-        self.assertEqual("facet_size=5&", r2.facets_limit)
-        r2._facets_init({"spatial" : ['48', '-37']})
-        self.assertEqual("facets=sourceResource.spatial.coordinates%3A48%3A-37&", r2.facets)
-
-    def test_paging_init(self):
-        r3 = self.r
-        r3._paging_init({'page_size' : 50, 'page' : 5 })
-        self.assertEqual("page_size=50&", r3.page_size, "Page size url fragment is correct")
-        self.assertEqual('page=5&', r3.page, 'Page url fragment is correct')
+    def test_single_value_formatter(self):
+        expected = "q=chicken"
+        self.assertEqual(self.query, expected, 'Single word single values are formattted correctly')
+        expected = "q=chicken+man"
+        self.assertEqual(self.multiword_query, expected, 'Multi word single values are formattted correctly')
 
     def test_multivalue_fields_formatter(self):
-        request  = Request(returnFields=('sourceResource.title', 'sourceResource.spatial.state'))
-        expected = "fields=sourceResource.title%2CsourceResource.spatial.state&"
-        self.assertEqual(request.returnFields, expected, "Return fields url fragment are correct")
+        expected = "fields=sourceResource.title%2CsourceResource.spatial.state"
+        self.assertEqual(self.multivalue_fields, expected, "Return fields url fragment are correct")
 
     def test_search_field_formatter(self):
-        request = Request(searchFields=({"sourceResource.title" : "Chicago", "sourceResource.subject" : "Food"}))
-        expected = "sourceResource.title=Chicago&sourceResource.subject=Food&"
-        self.assertEqual(request.searchFields, expected, "Search specific fields url fragments are correct")
+        expected = "sourceResource.title=Chicago&sourceResource.subject=Food"
+        self.assertEqual(self.search_fields, expected, "Search specific fields url fragments are correct")
+
+    def test_spatial_facet_formatter(self):
+        request  = self.r._facetSpatialFormatter([37, -48])
+        expected = "facets=sourceResource.spatial.coordinates%3A37%3A-48"
+        self.assertEqual(request, expected, "Spatial facets url fragments are correct")
 
     def test_build_url(self):
-        request = Request("chicken",searchFields=({'sourceResource.title': "Model"}))
-        expected = 'http://api.dp.la/v2/items?q=chicken&sourceResource.title=Model&api_key=9da474273d98c8dc3dc567939e89f9f8'
-        self.assertEqual(request.url, expected)
+        url_parts = []
 
-
+        url_parts.append(self.query)
+        url = self.r._buildUrl("items",url_parts)
+        expected = "http://api.dp.la/v2/items?q=chicken&api_key=9da474273d98c8dc3dc567939e89f9f8"
+        self.assertEqual(url, expected, "Single parameter item search url is constructed correctly")
+        url_parts.append(self.multivalue_fields)
+        url = self.r._buildUrl("items",url_parts)
+        expected = "http://api.dp.la/v2/items?q=chicken&fields=sourceResource.title%2CsourceResource.spatial.state&api_key=9da474273d98c8dc3dc567939e89f9f8"
+        self.assertEqual(url, expected, "Two parameter item search url is constructed correctly")
+        url_parts.append(self.search_fields)
+        url = self.r._buildUrl("items",url_parts)
+        expected = "http://api.dp.la/v2/items?q=chicken&fields=sourceResource.title%2CsourceResource.spatial.state&"
+        expected += "sourceResource.title=Chicago&sourceResource.subject=Food&api_key=9da474273d98c8dc3dc567939e89f9f8"
+        self.assertEqual(url, expected, "Three parameter item search url is constructed correctly")
 
 
 if __name__ == '__main__':
