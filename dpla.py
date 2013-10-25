@@ -56,7 +56,7 @@ class DPLA():
 
 class Request():
     def __init__(self, search_type="items", query=None, searchFields=None, fields=None, facets=None, spatial_facet=None,
-                 facet_size=None, sort=None, spatial_sort=None, page_size=None, page=None,  ):
+                 facet_size=None, sort=None, spatial_sort=None, page_size=None, page=None  ):
         # Build individual url fragments for different search criteria
         url_parts = []
         if query:
@@ -74,7 +74,7 @@ class Request():
         if sort and not spatial_sort:
             url_parts.append(self._singleValueFormatter('sort_by', sort))
         if spatial_sort:
-            url_parts.append(self._singleValueFormatter('sort_by_pin', ','.join(spatial_sort)))
+            url_parts.append(self._singleValueFormatter('sort_by_pin', "{},{}".format(*spatial_sort)))
             url_parts.append(self._singleValueFormatter('sort_by', "sourceResource.spatial.coordinates"))
         if page_size:
             url_parts.append(self._singleValueFormatter('page_size',page_size))
@@ -128,4 +128,6 @@ class Results():
         self.limit = response['limit']
         self.start  = response['start']
         self.items= [doc for doc in response['docs']]
+        if response.get('facets', None):
+            self.facets=[{k:v} for k,v in  response['facets'].iteritems()]
 
