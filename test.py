@@ -1,6 +1,6 @@
 import unittest
-from dpla import *
-import settings
+from dpla.api import *
+
 
 
 class testDPyLAClass(unittest.TestCase):

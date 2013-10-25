@@ -1,6 +1,6 @@
 from requests import get
 from requests.compat import urlencode
-import settings
+from dpla import settings
 
 
 class DPLA():
