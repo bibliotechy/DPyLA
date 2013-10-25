@@ -5,18 +5,13 @@ import settings
 
 class testDPyLAClass(unittest.TestCase):
 
-    def setUp(self):
-        self.dpla = DPLA()
 
     def test_api_key_passed_as_parameter(self):
-        key = "9da474273d98c8dc3dc567939e89f9f8"
+        key = "YourDPLAApiKeyGoesHereShouldBe32"
         dpla = DPLA(key)
         message = "Valid key passed as param should be set as attribute"
         self.assertEqual(dpla.api_key, key, message)
 
-    def test_api_key_from_settings(self):
-        message = "Valid key in settings should be set as attribute"
-        self.assertEqual(self.dpla.api_key, settings.API_KEY, message)
 
     def test_missing_api_key(self):
         settings.API_KEY = None
@@ -61,16 +56,16 @@ class DPyLARequest(unittest.TestCase):
 
         url_parts.append(self.query)
         url = self.r._buildUrl("items",url_parts)
-        expected = "http://api.dp.la/v2/items?q=chicken&api_key=9da474273d98c8dc3dc567939e89f9f8"
+        expected = "http://api.dp.la/v2/items?q=chicken&api_key="
         self.assertEqual(url, expected, "Single parameter item search url is constructed correctly")
         url_parts.append(self.multivalue_fields)
         url = self.r._buildUrl("items",url_parts)
-        expected = "http://api.dp.la/v2/items?q=chicken&fields=sourceResource.title%2CsourceResource.spatial.state&api_key=9da474273d98c8dc3dc567939e89f9f8"
+        expected = "http://api.dp.la/v2/items?q=chicken&fields=sourceResource.title%2CsourceResource.spatial.state&api_key="
         self.assertEqual(url, expected, "Two parameter item search url is constructed correctly")
         url_parts.append(self.search_fields)
         url = self.r._buildUrl("items",url_parts)
         expected = "http://api.dp.la/v2/items?q=chicken&fields=sourceResource.title%2CsourceResource.spatial.state&"
-        expected += "sourceResource.title=Chicago&sourceResource.subject=Food&api_key=9da474273d98c8dc3dc567939e89f9f8"
+        expected += "sourceResource.title=Chicago&sourceResource.subject=Food&api_key="
         self.assertEqual(url, expected, "Three parameter item search url is constructed correctly")
 
 

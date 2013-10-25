@@ -1,7 +1,4 @@
-API_KEY = "YOUR-API-HERE"
-BASE_URL = "http://api.dp.la/v2/"
-
-
+## Defines searchable fields so that we don' try to search fields that aren't real
 searchable_fields = (
     "dataProvider",
     "hasView",

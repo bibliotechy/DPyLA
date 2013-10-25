@@ -9,12 +9,10 @@ class DPLA():
 
         if api_key is not None:
             self.api_key = api_key
-        elif settings.API_KEY is not None:
-            self.api_key = settings.API_KEY
         else:
-            raise ValueError('DPLA API requires an api key. Run DPLA.get_key() to request one')
+            raise ValueError('DPLA API requires an api key.')
         if len(self.api_key) is not 32:
-            raise ValueError("The DPLA key is in the required format. PLease check it again")
+            raise ValueError("The DPLA key is not in the required format. PLease check it again")
 
     def search(self,q=None, search_type="items", **kwargs):
         """
@@ -50,15 +48,18 @@ class DPLA():
         kwargs['search_type'] = search_type
         if q:
             kwargs['query'] = q
+        kwargs['key'] = self.api_key
 
         request = Request(**kwargs)
         return Results(get(request.url).json(), request)
 
 class Request():
     def __init__(self, search_type="items", query=None, searchFields=None, fields=None, facets=None, spatial_facet=None,
-                 facet_size=None, sort=None, spatial_sort=None, page_size=None, page=None  ):
+                 facet_size=None, sort=None, spatial_sort=None, page_size=None, page=None, key=''  ):
         # Build individual url fragments for different search criteria
         url_parts = []
+        self.base_url = "http://api.dp.la/v2/"
+        self.api_key      =  key
         if query:
             url_parts.append(self._singleValueFormatter('q',query))
         if searchFields:
@@ -114,10 +115,10 @@ class Request():
 
 
     def _buildUrl(self, search_type, url_parts=None):
-        url = settings.BASE_URL + search_type + "?"
+        url = self.base_url + search_type + "?"
         if search_type == "items":
             url += "&".join(url_parts)
-        url += "&api_key=" + settings.API_KEY
+        url += "&api_key=" + self.api_key
         return url
 
 
