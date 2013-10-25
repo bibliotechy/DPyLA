@@ -18,7 +18,7 @@ Depends on the awesome [Requests package](http://www.python-requests.org/en/late
 
 Then fire up your fave python interpreter and:
 
-`>>> from dpla import DPLA`
+`>>> from dpla.api import DPLA`
 
 The create the dpla object with your DPLA API key.
 
