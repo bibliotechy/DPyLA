@@ -57,7 +57,7 @@ class DPLA():
 class Request():
     def __init__(self, search_type="items", query=None, searchFields=None, fields=None, facets=None, spatial_facet=None,
                  facet_size=None, sort=None, spatial_sort=None, page_size=None, page=None,  ):
-
+        # Build individual url fragments for different search criteria
         url_parts = []
         if query:
             url_parts.append(self._singleValueFormatter('q',query))
@@ -80,17 +80,31 @@ class Request():
             url_parts.append(self._singleValueFormatter('page_size',page_size))
         if page:
             url_parts.append(self._singleValueFormatter('page',page))
+        # Now string all the chunks together
         self.url = self._buildUrl(search_type, url_parts)
 
 
 
     def _singleValueFormatter(self, param_name, value):
-            return urlencode({param_name: value})
+        """
+        Creates an encoded URL fragment for parameters that contain only a single value
+
+        """
+        return urlencode({param_name: value})
 
     def _multiValueFormatter(self, param_name, values):
+        """
+        Creates an encoded URL fragment for parameters that may contain multiple values.
+
+        """
         return urlencode({param_name: ','.join(values)})
 
     def _searchFieldsFormatter(self, searchFields):
+        """
+        Creates an encoded URL fragment for searching for a value within a specific field.
+        If multiple fields are specified, a single string is returned
+
+        """
         sf = [urlencode({k:v}) for k,v in searchFields.items() if k in settings.searchable_fields]
         return '&'.join(sf)
 
@@ -115,5 +129,3 @@ class Results():
         self.start  = response['start']
         self.items= [doc for doc in response['docs']]
 
-    ##TODO##
-    # Add simple way to      
