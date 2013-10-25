@@ -13,7 +13,6 @@ Depends on the awesome [Requests package](http://www.python-requests.org/en/late
 
 ####Getting started
 
-`pip install requests`
 `pip install dpla`
 
 Then fire up your fave python interpreter and:
