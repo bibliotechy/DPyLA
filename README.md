@@ -6,8 +6,17 @@
 
 [The DPLA](http://dp.la) (Digital Public Library of America) is aggregation  digital library, archive and museum collections. What really makes it stand out is it's awesome API. This python library is a wrapper around that API, making it easier to interact with.
 
-####Getting started
+Tested and working with Python 2.7, 3.2, and 3.3
 
+### Dependencies
+Depends on the awesome [Requests package](http://www.python-requests.org/en/latest/)
+
+####Getting started
+
+`pip install requests`
+`pip install dpla`
+
+Then fire up your fave python interpreter and:
 
 `>>> from dpla import DPLA`
 

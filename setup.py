@@ -11,4 +11,5 @@ setup(
     download_url = 'https://github.com/bibliotechy/DPyLA/tarball/0.1', # I'll explain this in a second
     keywords = ['libraries', 'DPLA', 'museums'], # arbitrary keywords
     classifiers = [],
+    install_requires = [ 'requests' ]
     )
