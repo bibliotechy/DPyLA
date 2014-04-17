@@ -178,7 +178,7 @@ If that’s not enough, you can get the next ten items incrementing the page par
 This project is still in it's infancy. It ain't purrfect.
 * Right now, the client only does items search. Collections search and individual item fetch to come eventually.
 * Does not do a great job catching exceptions, so be warned!
-* Test coverage is limited.
+* Test coverage is limited. 
 
 ##License
 
