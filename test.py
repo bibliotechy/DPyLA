@@ -22,7 +22,6 @@ class testDPyLAClass(unittest.TestCase):
         with self.assertRaises(ValueError):
             dpla = DPLA("shortstring")
 
-
 class DPyLARequest(unittest.TestCase):
 
     def setUp(self):
@@ -68,6 +67,14 @@ class DPyLARequest(unittest.TestCase):
         expected += "sourceResource.title=Chicago&sourceResource.subject=Food&api_key="
         self.assertEqual(url, expected, "Three parameter item search url is constructed correctly")
 
+class DPyLASearch(unittest.TestCase):
+
+    def setUp(self):
+      self.dpla = DPLA("9da474273d98c8dc3dc567939e89f9f8")
+      
+    def test_search_simple(self):  
+      results = self.dpla.search("chickens")
+      self.assertGreaterEqual(results.count, 0, "Results count sould contain at least one result")
 
 if __name__ == '__main__':
     unittest.main()
