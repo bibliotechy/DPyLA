@@ -1,4 +1,5 @@
-from requests import get
+from re import match
+from requests import get, post
 from requests.compat import urlencode
 from dpla import settings
 
@@ -13,6 +14,22 @@ class DPLA():
             raise ValueError('DPLA API requires an api key.')
         if len(self.api_key) is not 32:
             raise ValueError("The DPLA key is not in the required format. PLease check it again")
+
+    @staticmethod
+    def new_key(email_address):
+        if not match(r"[^@]+@[^@]+\.[^@]+", email_address):
+            print("Hmmm...That doesn't look like an email address. Please check")
+            return
+        else:
+            r = post("http://api.dp.la/v2/api_key/" + email_address)
+            if r.status_code == 201:
+                print(r.content)
+            else:
+                print("Hmmm...there seems to have been an error.")
+
+
+
+
 
     def search(self,q=None, search_type="items", **kwargs):
         """

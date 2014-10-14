@@ -4,7 +4,10 @@
 #DPyLA - A Python client for the DPLA API
 #### under active development! 
 
-[The DPLA](http://dp.la) (Digital Public Library of America) is aggregation  digital library, archive and museum collections. What really makes it stand out is its awesome API. This python library is a wrapper around that API, making it easier to interact with.
+[The DPLA](http://dp.la) (Digital Public Library of America) is aggregation
+digital library, archive and museum collections. What really makes it stand
+out is its awesome API. This python library is a wrapper around that API,
+making it easier to interact with.
 
 Tested and working with Python 2.7, 3.2, and 3.3
 
@@ -23,7 +26,16 @@ The create the dpla object with your DPLA API key.
 
 `>>> dpla = DPLA('your-key-here')` 
 
-Now, create create your first search
+If you don't have a DPLA API key yet, you can
+[follow their instructions](http://dp.la/info/developers/codex/policies/#get-a-key)
+or simply:
+
+`>>> DPLA.new_key("your.email.address@here.com")`
+
+And then check you email.
+
+
+Now, lets create your first search
 
 `>>> result = dpla.search('chicken')`
 
