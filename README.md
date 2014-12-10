@@ -4,7 +4,7 @@
 #DPyLA - A Python client for the DPLA API
 #### under active development! 
 
-[The DPLA](http://dp.la) (Digital Public Library of America) is aggregation
+[The DPLA](http://dp.la) (Digital Public Library of America) is an aggregated
 digital library, archive and museum collections. What really makes it stand
 out is its awesome API. This python library is a wrapper around that API,
 making it easier to interact with.
@@ -22,7 +22,7 @@ Then fire up your fave python interpreter and:
 
 `>>> from dpla.api import DPLA`
 
-The create the dpla object with your DPLA API key.
+Then create the dpla object with your DPLA API key.
 
 `>>> dpla = DPLA('your-key-here')` 
 
@@ -35,7 +35,7 @@ or simply:
 And then check you email.
 
 
-Now, lets create your first search
+Now, let's create your first search
 
 `>>> result = dpla.search('chicken')`
 
@@ -67,14 +67,14 @@ You can also find out how many records were found matching that criteria
 925
 ```
 
-But you don't have all 925 records. Unless you tell it otherwise, DPLA Api sets a limit of ten records returned. 
+But you don't have all 925 records. Unless you tell it otherwise, DPLA API sets a limit of ten records returned. 
 ```
 >>> results.limit 
 10 # 
 ```
 
 
-But if you want more, it is easy it's easy just:
+But if you want more, it's easy. Just do this:
 ```
 >>> result = dpla.search(q="chicken", page_size=100)
 >>> result.limit
@@ -132,7 +132,7 @@ Get back a list of the most common terms within a field for this set of results.
 
 ```
 ####Spatial Facet
-You can also facet by distance from a set of geo=coordinates. It requires extra work in the search url, so it is a seperate parameter.
+You can also facet by distance from a set of geo-coordinates. It requires extra work in the search url, so it is a seperate parameter.
 Pass a length 2 list of [lat, lng]  to the parameter spatial_facet
 ```
 >>> result = dpla.search("chicken", spatial_facet=[37,-48])
@@ -149,8 +149,8 @@ Pass a length 2 list of [lat, lng]  to the parameter spatial_facet
     ]}
 ```
 ###Facet Size
-Normally, asking for facets will return A LOT OF FACETS!. If you only want a few, this is for you.
-Pass a int to the paramters facet_size.
+Normally, asking for facets will return A LOT OF FACETS! If you only want a few, this is for you.
+Pass an int to the paramters facet_size.
 ```
 >>> result = dpla.search("chicken", facets=["sourceResource.subject"], facet_size=2)
 >>> result.facets[1]
@@ -163,7 +163,7 @@ Pass a int to the paramters facet_size.
 ```
 
 ####Sort
-How do you want the records sorted. Pass a string field name to the sort parameter
+How do you want the records sorted? Pass a string field name to the sort parameter
 ```
 result = dpla.search("chicken", sort="sourceResource.title")
 ```
@@ -173,7 +173,7 @@ You can alse sort by distance from a geo-coordinate. Pass the length 2 tuple of 
 >>> result = dpla.search("chicken", spatial_sort=[37, -48])
 ```
 ####Page size
-By Defaut, only ten records are returned per request. To increase that number, pass a integer (or string integer) to page_size paramter. The upper limit is 100 per request.
+By Default, only ten records are returned per request. To increase that number, pass an integer (or string integer) to page_size paramter. The upper limit is 100 per request.
 ```
 >>> result = dpla.search(q="chicken", page_size=100)
 ```
@@ -187,9 +187,9 @@ If that’s not enough, you can get the next ten items incrementing the page par
 
 
 ##Limitations
-This project is still in it's infancy. It ain't purrfect.
+This project is still in its infancy. It ain't purrfect.
 * Right now, the client only does items search. Collections search and individual item fetch to come eventually.
-* Does not do a great job catching exceptions, so be warned!
+* It does not do a great job catching exceptions, so be warned!
 * Test coverage is limited. 
 
 ##License
