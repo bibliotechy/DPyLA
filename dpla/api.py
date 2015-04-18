@@ -27,7 +27,13 @@ class DPLA():
             else:
                 print("Hmmm...there seems to have been an error.")
 
-
+    def get_item(self, id=[], **kwargs):
+        if not id:
+            raise ValueError("No id provided to fetch")
+        kwargs['id'] = id
+        kwargs['key'] = self.api_key
+        request = Request(**kwargs)
+        return Results(get(request.url).json(), request)
 
 
 
@@ -72,11 +78,13 @@ class DPLA():
 
 class Request():
     def __init__(self, search_type="items", query=None, searchFields=None, fields=None, facets=None, spatial_facet=None,
-                 facet_size=None, sort=None, spatial_sort=None, page_size=None, page=None, key=''  ):
+                 facet_size=None, sort=None, spatial_sort=None, page_size=None, page=None, key='', id=None  ):
         # Build individual url fragments for different search criteria
         url_parts = []
         self.base_url = "http://api.dp.la/v2/"
-        self.api_key      =  key
+        self.api_key  =  key
+        if id:
+            id = (",".join(id))
         if query:
             url_parts.append(self._singleValueFormatter('q',query))
         if searchFields:
@@ -99,7 +107,7 @@ class Request():
         if page:
             url_parts.append(self._singleValueFormatter('page',page))
         # Now string all the chunks together
-        self.url = self._buildUrl(search_type, url_parts)
+        self.url = self._buildUrl(search_type, url_parts, id)
 
 
 
@@ -131,20 +139,29 @@ class Request():
         return urlencode({"facets": coords})
 
 
-    def _buildUrl(self, search_type, url_parts=None):
-        url = self.base_url + search_type + "?"
+    def _buildUrl(self, search_type, url_parts=[], id=None):
+        url = self.base_url + search_type
+        if id:
+            url += "/" + id + "?"
+        else:
+            url += "?"
         if search_type == "items":
             url += "&".join(url_parts)
-        url += "&api_key=" + self.api_key
+        if url_parts:
+            url += "&api_key=" + self.api_key
+        else:
+            url += "api_key=" + self.api_key
+        print(url)
         return url
+
 
 
 class Results():
     def __init__(self, response, request):
         self.request = request
-        self.count = response['count']
-        self.limit = response['limit']
-        self.start  = response['start']
+        self.count = response.get('count', None)
+        self.limit = response.get('limit', None)
+        self.start  = response.get('start', None)
         self.items= [doc for doc in response['docs']]
         if response.get('facets', None):
             self.facets=[{k:v} for k,v in  response['facets'].iteritems()]
