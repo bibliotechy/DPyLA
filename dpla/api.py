@@ -27,7 +27,7 @@ class DPLA():
             else:
                 print("Hmmm...there seems to have been an error.")
 
-    def get_item(self, id=[], **kwargs):
+    def fetch_by_id(self, id=[], **kwargs):
         if not id:
             raise ValueError("No id provided to fetch")
         kwargs['id'] = id
