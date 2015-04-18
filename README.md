@@ -80,6 +80,22 @@ But if you want more, it's easy. Just do this:
 >>> result.limit
 100 # More records, YAY!
 ```
+### Fetch item(s) by ID 
+If you have the id of of a record you want to retrieve, or a series of IDs, you can use the `fetch_by_id` method. Just pass an array of IDs and it will return all fields for those records.
+```
+>>> result = dpla.fetch_by_id(["93583acc6425f8172b7b506f44a32121"])
+>>> result.items[0]["@id"]
+'http://dp.la/api/items/93583acc6425f8172b7b506f44a32121'
+```
+
+Or multiple IDs
+```
+>>> ids = ["93583acc6425f8172b7b506f44a32121","fe47a8b71de4c136fe115a19ead13e4d" ]
+>>> result = dpla.fetch_by_id(ids)
+>>> result.count
+2
+```
+
 
 ###More Options
 The DPLA gives you a lot of options for tailoring your search to get back exactly what you want. DPyLA helps make creating those fine grained searches easier (easier than creating your own 250-charcter url anyway!) 
@@ -186,9 +202,11 @@ If that’s not enough, you can get the next ten items incrementing the page par
 
 
 
+
+
 ##Limitations
 This project is still in its infancy. It ain't purrfect.
-* Right now, the client only does items search. Collections search and individual item fetch to come eventually.
+* Right now, the client only does items search. Collections search ~~and individual item fetch~~ to come eventually.
 * It does not do a great job catching exceptions, so be warned!
 * Test coverage is limited. 
 
