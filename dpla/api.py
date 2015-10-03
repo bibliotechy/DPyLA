@@ -1,4 +1,5 @@
 from re import match
+from past.builtins import xrange
 from requests import get, post
 from requests.compat import urlencode
 from dpla import settings
