@@ -82,7 +82,21 @@ class DPyLASearch(unittest.TestCase):
       
     def test_search_simple(self):  
       results = self.dpla.search("chickens")
-      self.assertGreaterEqual(results.count, 0, "Results count sould contain at least one result")
+      self.assertGreaterEqual(results.count, 0, "Results count should contain at least one result")
+
+class DPyLAResults(unittest.TestCase):
+
+    def setUp(self):
+        self.dpla = DPLA("9da474273d98c8dc3dc567939e89f9f8")
+
+    def test_all_records_method(self):
+        results = self.dpla.search("chicken man new old", fields=["sourceResource.title"])
+        count = 0
+        for i in results.all_records():
+            count += 1
+        self.assertEqual(results.count, count,
+                         "Iterates through %i records, but %i are in result" % (count, results.count))
+
 
 if __name__ == '__main__':
     unittest.main()

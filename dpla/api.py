@@ -35,9 +35,7 @@ class DPLA():
         request = Request(**kwargs)
         return Results(get(request.url).json(), request)
 
-
-
-    def search(self,q=None, search_type="items", **kwargs):
+    def search(self, q=None, search_type="items", **kwargs):
         """
         Builds and performs an item search.
 
@@ -74,42 +72,42 @@ class DPLA():
         kwargs['key'] = self.api_key
 
         request = Request(**kwargs)
-        return Results(get(request.url).json(), request)
+        return Results(get(request.url).json(), request, self)
 
 class Request():
-    def __init__(self, search_type="items", query=None, searchFields=None, fields=None, facets=None, spatial_facet=None,
-                 facet_size=None, sort=None, spatial_sort=None, page_size=None, page=None, key='', id=None  ):
+    def __init__(self, search_type="items", **kwargs):
+        self.params = kwargs
         # Build individual url fragments for different search criteria
         url_parts = []
         self.base_url = "http://api.dp.la/v2/"
-        self.api_key  =  key
-        if id:
-            id = (",".join(id))
-        if query:
-            url_parts.append(self._singleValueFormatter('q',query))
-        if searchFields:
-            url_parts.append(self._searchFieldsFormatter(searchFields))
-        if fields:
-            url_parts.append(self._multiValueFormatter('fields',fields))
-        if facets and not spatial_facet:
-            url_parts.append(self._multiValueFormatter('facets',facets))
-        if spatial_facet:
-            url_parts.append(self._facetSpatialFormatter(spatial_facet))
-        if facet_size:
-            url_parts.append(self._singleValueFormatter('facet_size',facet_size))
-        if sort and not spatial_sort:
-            url_parts.append(self._singleValueFormatter('sort_by', sort))
-        if spatial_sort:
-            url_parts.append(self._singleValueFormatter('sort_by_pin', "{},{}".format(*spatial_sort)))
+        self.api_key  =  kwargs.get('key', "")
+        if kwargs.get('id'):
+            iid = (",".join(kwargs['id']))
+        else:
+            iid = ""
+        if kwargs.get('query'):
+            url_parts.append(self._singleValueFormatter('q',kwargs['query']))
+        if kwargs.get('searchFields'):
+            url_parts.append(self._searchFieldsFormatter(kwargs['searchFields']))
+        if kwargs.get('fields'):
+            url_parts.append(self._multiValueFormatter('fields',kwargs['fields']))
+        if kwargs.get('facets') and not kwargs.get('spatial_facet'):
+            url_parts.append(self._multiValueFormatter('facets',kwargs['facets']))
+        if kwargs.get('spatial_facet'):
+            url_parts.append(self._facetSpatialFormatter(kwargs['spatial_facet']))
+        if kwargs.get('facet_size'):
+            url_parts.append(self._singleValueFormatter('facet_size',kwargs['facet_size']))
+        if kwargs.get('sort') and not kwargs.get('spatial_sort'):
+            url_parts.append(self._singleValueFormatter('sort_by', kwargs['sort']))
+        if kwargs.get('spatial_sort'):
+            url_parts.append(self._singleValueFormatter('sort_by_pin', "{},{}".format(*kwargs['spatial_sort'])))
             url_parts.append(self._singleValueFormatter('sort_by', "sourceResource.spatial.coordinates"))
-        if page_size:
-            url_parts.append(self._singleValueFormatter('page_size',page_size))
-        if page:
-            url_parts.append(self._singleValueFormatter('page',page))
+        if kwargs.get('page_size'):
+            url_parts.append(self._singleValueFormatter('page_size',kwargs['page_size']))
+        if kwargs.get('page'):
+            url_parts.append(self._singleValueFormatter('page',kwargs['page']))
         # Now string all the chunks together
-        self.url = self._buildUrl(search_type, url_parts, id)
-
-
+        self.url = self._buildUrl(search_type, url_parts, iid)
 
     def _singleValueFormatter(self, param_name, value):
         """
@@ -138,7 +136,6 @@ class Request():
         coords = "sourceResource.spatial.coordinates:{}:{}".format(*spatial_facet)
         return urlencode({"facets": coords})
 
-
     def _buildUrl(self, search_type, url_parts=[], id=None):
         url = self.base_url + search_type
         if id:
@@ -151,18 +148,33 @@ class Request():
             url += "&api_key=" + self.api_key
         else:
             url += "api_key=" + self.api_key
-        print(url)
         return url
 
 
-
-class Results():
-    def __init__(self, response, request):
+class Results:
+    def __init__(self, response, request, dplaObject):
+        self.dpla = dplaObject
         self.request = request
         self.count = response.get('count', None)
         self.limit = response.get('limit', None)
         self.start  = response.get('start', None)
         self.items= [doc for doc in response['docs']]
         if response.get('facets', None):
-            self.facets=[{k:v} for k,v in  response['facets'].iteritems()]
+            self.facets = [{k: v} for k, v in response['facets'].iteritems()]
+
+    def next_page(self):
+        params = self.request.params
+        params['page'] = (self.start / self.limit) + 2
+        next_response = self.dpla.search(**params)
+        self.start = next_response.start
+        self.items = next_response.items
+
+    def all_records(self):
+        for i in xrange(self.count):
+            yield self.items[i - self.start]
+            if not i < self.start + self.limit - 1:
+                self.next_page()
+
+
+
 
