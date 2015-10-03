@@ -9,7 +9,7 @@ digital library, archive and museum collections. What really makes it stand
 out is its awesome API. This python library is a wrapper around that API,
 making it easier to interact with.
 
-Tested and working with Python 2.7, 3.2, and 3.3
+Tested and working with Python 2.7 and 3.3
 
 ### Dependencies
 Depends on the awesome [Requests package](http://www.python-requests.org/en/latest/)
@@ -79,7 +79,24 @@ But if you want more, it's easy. Just do this:
 >>> result = dpla.search(q="chicken", page_size=100)
 >>> result.limit
 100 # More records, YAY!
+
 ```
+
+You can also use the `all_records()` helper method to get back a generator that allows you to iterate through all of the records in your result list.
+
+```
+>>> result = dpla.search(q="chicken", page_size=100)
+>>> result.count
+925
+>>> for item in result.all_records():
+      print(item["sourceResuorce"]["title"])
+"Chicken"
+"Chicken and cow"
+"Chicken and pig"
+...(922 more titles)
+"Last of the Chicken records"
+```
+
 ### Fetch item(s) by ID 
 If you have the id of of a record you want to retrieve, or a series of IDs, you can use the `fetch_by_id` method. Just pass an array of IDs and it will return all fields for those records.
 ```
@@ -92,9 +109,10 @@ Or multiple IDs
 ```
 >>> ids = ["93583acc6425f8172b7b506f44a32121","fe47a8b71de4c136fe115a19ead13e4d" ]
 >>> result = dpla.fetch_by_id(ids)
->>> result.count
+>>> result.count 
 2
 ```
+
 
 
 ###More Options
