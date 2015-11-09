@@ -5,9 +5,9 @@ from requests.compat import urlencode
 from dpla import settings
 
 
-class DPLA():
+class DPLA(object):
 
-    def __init__(self,api_key=None):
+    def __init__(self, api_key=None):
 
         if api_key is not None:
             self.api_key = api_key
@@ -34,7 +34,7 @@ class DPLA():
         kwargs['id'] = id
         kwargs['key'] = self.api_key
         request = Request(**kwargs)
-        return Results(get(request.url).json(), request)
+        return Results(get(request.url).json(), request, self)
 
     def search(self, q=None, search_type="items", **kwargs):
         """
@@ -75,7 +75,8 @@ class DPLA():
         request = Request(**kwargs)
         return Results(get(request.url).json(), request, self)
 
-class Request():
+class Request(object):
+
     def __init__(self, search_type="items", **kwargs):
         self.params = kwargs
         # Build individual url fragments for different search criteria
@@ -152,7 +153,8 @@ class Request():
         return url
 
 
-class Results:
+class Results(object):
+
     def __init__(self, response, request, dplaObject):
         self.dpla = dplaObject
         self.request = request
