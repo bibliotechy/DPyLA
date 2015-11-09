@@ -27,7 +27,7 @@ class DPLA(object):
             else:
                 print("Hmmm...there seems to have been an error.")
 
-    def fetch_by_id(self, id=[], **kwargs):
+    def fetch_by_id(self, id=None, **kwargs):
         if not id:
             raise ValueError("No id provided to fetch")
         kwargs['id'] = id
@@ -137,8 +137,10 @@ class Request(object):
         coords = "sourceResource.spatial.coordinates:{}:{}".format(*spatial_facet)
         return urlencode({"facets": coords})
 
-    def _buildUrl(self, search_type, url_parts=[], id=None):
+    def _buildUrl(self, search_type, url_parts=None, id=None):
         url = self.base_url + search_type
+        url_parts = url_parts or []
+
         if id:
             url += "/" + id + "?"
         else:
@@ -149,6 +151,7 @@ class Request(object):
             url += "&api_key=" + self.api_key
         else:
             url += "api_key=" + self.api_key
+
         return url
 
 
@@ -159,8 +162,8 @@ class Results(object):
         self.request = request
         self.count = response.get('count', None)
         self.limit = response.get('limit', None)
-        self.start  = response.get('start', None)
-        self.items= [doc for doc in response['docs']]
+        self.start = response.get('start', None)
+        self.items = [doc for doc in response['docs']]
         if response.get('facets', None):
             self.facets = [{k: v} for k, v in response['facets'].iteritems()]
 
