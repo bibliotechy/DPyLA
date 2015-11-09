@@ -1,8 +1,6 @@
 import unittest
 from dpla.api import *
 
-
-
 class testDPyLAClass(unittest.TestCase):
 
 
@@ -42,8 +40,9 @@ class DPyLARequest(unittest.TestCase):
         self.assertEqual(self.multivalue_fields, expected, "Return fields url fragment are correct")
 
     def test_search_field_formatter(self):
-        expected = "sourceResource.title=Chicago&sourceResource.subject=Food"
-        self.assertEqual(self.search_fields, expected, "Search specific fields url fragments are correct")
+        expected = ("sourceResource.title=Chicago", "sourceResource.subject=Food")
+        for expect in expected:
+            self.assertIn(expect, self.search_fields, "Search specific fields url fragments are correct")
 
     def test_spatial_facet_formatter(self):
         request  = self.r._facetSpatialFormatter([37, -48])
