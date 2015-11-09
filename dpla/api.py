@@ -1,5 +1,4 @@
 from re import match
-from past.builtins import xrange
 from requests import get, post
 from requests.compat import urlencode
 from dpla import settings
@@ -173,7 +172,7 @@ class Results(object):
         self.items = next_response.items
 
     def all_records(self):
-        for i in xrange(self.count):
+        for i in range(self.count):
             yield self.items[i - self.start]
             if not i < self.start + self.limit - 1:
                 self.next_page()
