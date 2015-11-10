@@ -1,13 +1,12 @@
 from re import match
-from past.builtins import xrange
 from requests import get, post
 from requests.compat import urlencode
 from dpla import settings
 
 
-class DPLA():
+class DPLA(object):
 
-    def __init__(self,api_key=None):
+    def __init__(self, api_key=None):
 
         if api_key is not None:
             self.api_key = api_key
@@ -28,13 +27,13 @@ class DPLA():
             else:
                 print("Hmmm...there seems to have been an error.")
 
-    def fetch_by_id(self, id=[], **kwargs):
+    def fetch_by_id(self, id=None, **kwargs):
         if not id:
             raise ValueError("No id provided to fetch")
         kwargs['id'] = id
         kwargs['key'] = self.api_key
         request = Request(**kwargs)
-        return Results(get(request.url).json(), request)
+        return Results(get(request.url).json(), request, self)
 
     def search(self, q=None, search_type="items", **kwargs):
         """
@@ -75,7 +74,8 @@ class DPLA():
         request = Request(**kwargs)
         return Results(get(request.url).json(), request, self)
 
-class Request():
+class Request(object):
+
     def __init__(self, search_type="items", **kwargs):
         self.params = kwargs
         # Build individual url fragments for different search criteria
@@ -137,8 +137,10 @@ class Request():
         coords = "sourceResource.spatial.coordinates:{}:{}".format(*spatial_facet)
         return urlencode({"facets": coords})
 
-    def _buildUrl(self, search_type, url_parts=[], id=None):
+    def _buildUrl(self, search_type, url_parts=None, id=None):
         url = self.base_url + search_type
+        url_parts = url_parts or []
+
         if id:
             url += "/" + id + "?"
         else:
@@ -149,17 +151,19 @@ class Request():
             url += "&api_key=" + self.api_key
         else:
             url += "api_key=" + self.api_key
+
         return url
 
 
-class Results:
+class Results(object):
+
     def __init__(self, response, request, dplaObject):
         self.dpla = dplaObject
         self.request = request
         self.count = response.get('count', None)
         self.limit = response.get('limit', None)
-        self.start  = response.get('start', None)
-        self.items= [doc for doc in response['docs']]
+        self.start = response.get('start', None)
+        self.items = [doc for doc in response['docs']]
         if response.get('facets', None):
             self.facets = [{k: v} for k, v in response['facets'].iteritems()]
 
@@ -171,7 +175,7 @@ class Results:
         self.items = next_response.items
 
     def all_records(self):
-        for i in xrange(self.count):
+        for i in range(self.count):
             yield self.items[i - self.start]
             if not i < self.start + self.limit - 1:
                 self.next_page()

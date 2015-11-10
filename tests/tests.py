@@ -1,8 +1,6 @@
 import unittest
 from dpla.api import *
 
-
-
 class testDPyLAClass(unittest.TestCase):
 
 
@@ -42,8 +40,9 @@ class DPyLARequest(unittest.TestCase):
         self.assertEqual(self.multivalue_fields, expected, "Return fields url fragment are correct")
 
     def test_search_field_formatter(self):
-        expected = "sourceResource.title=Chicago&sourceResource.subject=Food"
-        self.assertEqual(self.search_fields, expected, "Search specific fields url fragments are correct")
+        expected = ("sourceResource.title=Chicago", "sourceResource.subject=Food")
+        for expect in expected:
+            self.assertIn(expect, self.search_fields, "Search specific fields url fragments are correct")
 
     def test_spatial_facet_formatter(self):
         request  = self.r._facetSpatialFormatter([37, -48])
@@ -54,26 +53,36 @@ class DPyLARequest(unittest.TestCase):
         url_parts = []
 
         url_parts.append(self.query)
-        url = self.r._buildUrl("items",url_parts)
         expected = "http://api.dp.la/v2/items?q=chicken&api_key="
+        url = self.r._buildUrl("items", url_parts)
+
         self.assertEqual(url, expected, "Single parameter item search url is constructed correctly")
+
         url_parts.append(self.multivalue_fields)
-        url = self.r._buildUrl("items",url_parts)
+        url = self.r._buildUrl("items", url_parts)
         expected = "http://api.dp.la/v2/items?q=chicken&fields=sourceResource.title%2CsourceResource.spatial.state&api_key="
         self.assertEqual(url, expected, "Two parameter item search url is constructed correctly")
+
         url_parts.append(self.search_fields)
-        url = self.r._buildUrl("items",url_parts)
-        expected = "http://api.dp.la/v2/items?q=chicken&fields=sourceResource.title%2CsourceResource.spatial.state&"
-        expected += "sourceResource.title=Chicago&sourceResource.subject=Food&api_key="
-        self.assertEqual(url, expected, "Three parameter item search url is constructed correctly")
-        id="93583acc6425f8172b7b506f44a32121"
+        url = self.r._buildUrl("items", url_parts)
+
+        expected = (
+            'q=chicken', 'sourceResource.title=Chicago', 'sourceResource.subject=Food', 'api_key=', 
+            'fields=sourceResource.title%2CsourceResource.spatial.state'
+        )
+        for expect in expected:
+            self.assertIn(expect, url, "Three parameter item search url is constructed correctly")
+
+        id = "93583acc6425f8172b7b506f44a32121"
         url = self.r._buildUrl("items", id=id)
         expected = "http://api.dp.la/v2/items/93583acc6425f8172b7b506f44a32121?api_key="
         self.assertEqual(url, expected)
+
         multiple_ids = "fe47a8b71de4c136fe115a19ead13e4d,93583acc6425f8172b7b506f44a32121"
         url = self.r._buildUrl("items", id=multiple_ids)
         expected = "http://api.dp.la/v2/items/fe47a8b71de4c136fe115a19ead13e4d,93583acc6425f8172b7b506f44a32121?api_key="
         self.assertEqual(url, expected)
+
 
 class DPyLASearch(unittest.TestCase):
 
