@@ -33,7 +33,19 @@ class DPLA(object):
         kwargs['id'] = id
         kwargs['key'] = self.api_key
         request = Request(**kwargs)
-        return Results(get(request.url).json(), request, self)
+        return Results(get(request.url).json(), request)
+    
+    def list_providers(self):
+        providers = self.search(facets=["provider.@id"], fields=["@id"])
+	return [ provider['term'] for provider in providers.facets[0]['provider.@id']['terms'] ]
+
+    def search_in_provider(self, provider=None, q=None, search_type='items', **kwargs):
+	just_provider = {'provider.@id' : provider}
+	if kwargs.get('searchFields', None):
+	    kwargs['searchFields'].update(just_provider)
+	else:
+	    kwargs['searchFields'] = just_provider
+        return self.search(q=q, search_type=search_type, **kwargs)
 
     def search(self, q=None, search_type="items", **kwargs):
         """
