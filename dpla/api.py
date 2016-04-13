@@ -33,7 +33,7 @@ class DPLA(object):
         kwargs['id'] = id
         kwargs['key'] = self.api_key
         request = Request(**kwargs)
-        return Results(get(request.url).json(), request)
+        return Results(get(request.url).json(), request, self)
     
     def list_providers(self):
         providers = self.search(facets=["provider.@id"], fields=["@id"])
