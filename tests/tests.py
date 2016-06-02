@@ -53,14 +53,14 @@ class DPyLARequest(unittest.TestCase):
         url_parts = []
 
         url_parts.append(self.query)
-        expected = "http://api.dp.la/v2/items?q=chicken&api_key="
+        expected = "https://api.dp.la/v2/items?q=chicken&api_key="
         url = self.r._buildUrl("items", url_parts)
 
         self.assertEqual(url, expected, "Single parameter item search url is constructed correctly")
 
         url_parts.append(self.multivalue_fields)
         url = self.r._buildUrl("items", url_parts)
-        expected = "http://api.dp.la/v2/items?q=chicken&fields=sourceResource.title%2CsourceResource.spatial.state&api_key="
+        expected = "https://api.dp.la/v2/items?q=chicken&fields=sourceResource.title%2CsourceResource.spatial.state&api_key="
         self.assertEqual(url, expected, "Two parameter item search url is constructed correctly")
 
         url_parts.append(self.search_fields)
@@ -75,12 +75,12 @@ class DPyLARequest(unittest.TestCase):
 
         id = "93583acc6425f8172b7b506f44a32121"
         url = self.r._buildUrl("items", id=id)
-        expected = "http://api.dp.la/v2/items/93583acc6425f8172b7b506f44a32121?api_key="
+        expected = "https://api.dp.la/v2/items/93583acc6425f8172b7b506f44a32121?api_key="
         self.assertEqual(url, expected)
 
         multiple_ids = "fe47a8b71de4c136fe115a19ead13e4d,93583acc6425f8172b7b506f44a32121"
         url = self.r._buildUrl("items", id=multiple_ids)
-        expected = "http://api.dp.la/v2/items/fe47a8b71de4c136fe115a19ead13e4d,93583acc6425f8172b7b506f44a32121?api_key="
+        expected = "https://api.dp.la/v2/items/fe47a8b71de4c136fe115a19ead13e4d,93583acc6425f8172b7b506f44a32121?api_key="
         self.assertEqual(url, expected)
 
 
