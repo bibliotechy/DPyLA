@@ -21,7 +21,7 @@ class DPLA(object):
             print("Hmmm...That doesn't look like an email address. Please check")
             return
         else:
-            r = post("http://api.dp.la/v2/api_key/" + email_address)
+            r = post("https://api.dp.la/v2/api_key/" + email_address)
             if r.status_code == 201:
                 print(r.content)
             else:
@@ -46,7 +46,7 @@ class DPLA(object):
          search in specific fields -- key = searchFields , value = dictionary of fieldname(s) and search values
           Value is searched for only in the specified field.
           Multiple fields / search terms can be listed
-          List of available fields is at http://dp.la/info/developers/codex/responses/field-reference/
+          List of available fields is at https://dp.la/info/developers/codex/responses/field-reference/
          return fields -- "fields" as key, list of field names as value
           Only the values of specified fields will be returned.
           If no fields are passed, values for all fields will be returned.
@@ -80,7 +80,7 @@ class Request(object):
         self.params = kwargs
         # Build individual url fragments for different search criteria
         url_parts = []
-        self.base_url = "http://api.dp.la/v2/"
+        self.base_url = "https://api.dp.la/v2/"
         self.api_key  =  kwargs.get('key', "")
         if kwargs.get('id'):
             iid = (",".join(kwargs['id']))
