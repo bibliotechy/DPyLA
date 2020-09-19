@@ -1,5 +1,6 @@
 import unittest
 from dpla.api import *
+import os
 
 class testDPyLAClass(unittest.TestCase):
 
@@ -67,7 +68,7 @@ class DPyLARequest(unittest.TestCase):
         url = self.r._buildUrl("items", url_parts)
 
         expected = (
-            'q=chicken', 'sourceResource.title=Chicago', 'sourceResource.subject=Food', 'api_key=', 
+            'q=chicken', 'sourceResource.title=Chicago', 'sourceResource.subject=Food', 'api_key=',
             'fields=sourceResource.title%2CsourceResource.spatial.state'
         )
         for expect in expected:
@@ -87,16 +88,18 @@ class DPyLARequest(unittest.TestCase):
 class DPyLASearch(unittest.TestCase):
 
     def setUp(self):
-      self.dpla = DPLA("9da474273d98c8dc3dc567939e89f9f8")
-      
-    def test_search_simple(self):  
+      api_key = os.environ['DPLA_API_KEY']
+      self.dpla = DPLA(api_key)
+
+    def test_search_simple(self):
       results = self.dpla.search("chickens")
       self.assertGreaterEqual(results.count, 0, "Results count should contain at least one result")
 
 class DPyLAResults(unittest.TestCase):
 
     def setUp(self):
-        self.dpla = DPLA("9da474273d98c8dc3dc567939e89f9f8")
+      api_key = os.environ['DPLA_API_KEY']
+      self.dpla = DPLA(api_key)
 
     def test_all_records_method(self):
         results = self.dpla.search("chicken man new old", fields=["sourceResource.title"])

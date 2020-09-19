@@ -169,7 +169,7 @@ class Results(object):
 
     def next_page(self):
         params = self.request.params
-        params['page'] = (self.start / self.limit) + 2
+        params['page'] = (int(self.start / self.limit)) + 2
         next_response = self.dpla.search(**params)
         self.start = next_response.start
         self.items = next_response.items
@@ -179,7 +179,3 @@ class Results(object):
             yield self.items[i - self.start]
             if not i < self.start + self.limit - 1:
                 self.next_page()
-
-
-
-
