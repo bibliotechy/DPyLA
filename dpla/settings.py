@@ -57,4 +57,4 @@ searchable_fields = (
     "sourceResource.temporal.end",
     "sourceResource.title",
     "sourceResource.type",
-    )
+)
