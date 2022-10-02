@@ -1,4 +1,4 @@
-![Travis icons](https://travis-ci.org/bibliotechy/DPyLA.png)
+![Build status](https://github.com/bibliotechy/dpyla/actions/workflows/python.yaml/badge.svg)
 
 # DPyLA - A Python client for the DPLA API
 #### under active development! 
@@ -8,7 +8,7 @@ digital library, archive and museum collections. What really makes it stand
 out is its awesome API. This python library is a wrapper around that API,
 making it easier to interact with.
 
-Tested and working with Python 2.7, 3.3, 3.4, and 3.5.
+Tested and working with Python 3.7, 3.8, 3.9, 3.10.
 
 ### Dependencies
 Depends on the awesome [Requests package](http://www.python-requests.org/en/latest/)
