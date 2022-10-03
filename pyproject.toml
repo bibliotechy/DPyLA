@@ -1,0 +1,18 @@
+[project]
+name = "dpla"
+version = "0.5"
+authors = [
+  { name="Chad Nelson", email="chadbnelson@gmail.com" },
+]
+description = "A client for the Digital Public Library of America (DPLA) API"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Development Status :: 5 - Production/Stable",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/bibliotechy/dpyla"
+"Bug Tracker" = "https://github.com/bibliotechy/dpyla/issues"
